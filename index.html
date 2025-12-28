@@ -1,243 +1,331 @@
-"""
-Microsoft Rewards Search Helper - Educational Tool
-WARNING: Automated searching violates Microsoft Terms of Service
-This tool helps ORGANIZE manual searches only
-"""
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>
 
-import webbrowser
-import time
-import random
-from datetime import datetime
-import json
-import os
 
-class MicrosoftRewardsHelper:
-    def __init__(self):
-        self.data_file = "rewards_progress.json"
-        self.pc_max = 30  # Maximum PC searches per day (India Level 2)
-        self.mobile_max = 20  # Maximum mobile searches per day
-        self.pc_points = 3  # Points per PC search
-        self.mobile_points = 3  # Points per mobile search
-        
-        # Diverse search topics for manual searching
-        self.search_topics = [
-            "weather forecast today", "latest technology news", "healthy recipes",
-            "stock market updates", "sports scores", "movie reviews 2025",
-            "best smartphones 2025", "fitness tips", "travel destinations",
-            "python programming tutorial", "AI news", "book recommendations",
-            "cricket news India", "cooking recipes", "investment tips",
-            "space exploration", "electric vehicles news", "climate change",
-            "music albums 2025", "gaming news", "health wellness tips",
-            "business news India", "photography tips", "science discoveries",
-            "fashion trends", "home decor ideas", "productivity apps",
-            "language learning", "historical facts", "environmental conservation",
-            "yoga exercises", "budget travel tips", "tech gadgets 2025"
-        ]
-        
-        self.load_progress()
-    
-    def load_progress(self):
-        """Load today's progress from file"""
-        if os.path.exists(self.data_file):
-            with open(self.data_file, 'r') as f:
-                data = json.load(f)
-                today = datetime.now().strftime("%Y-%m-%d")
-                
-                # Reset if it's a new day
-                if data.get('date') != today:
-                    self.reset_progress()
-                else:
-                    self.pc_searches = data.get('pc_searches', 0)
-                    self.mobile_searches = data.get('mobile_searches', 0)
-        else:
-            self.reset_progress()
-    
-    def save_progress(self):
-        """Save progress to file"""
-        data = {
-            'date': datetime.now().strftime("%Y-%m-%d"),
-            'pc_searches': self.pc_searches,
-            'mobile_searches': self.mobile_searches
-        }
-        with open(self.data_file, 'w') as f:
-            json.dump(data, f, indent=2)
-    
-    def reset_progress(self):
-        """Reset daily progress"""
-        self.pc_searches = 0
-        self.mobile_searches = 0
-        self.save_progress()
-    
-    def display_banner(self):
-        """Display warning banner"""
-        print("\n" + "="*70)
-        print("⚠️  MICROSOFT REWARDS SEARCH HELPER - EDUCATIONAL TOOL")
-        print("="*70)
-        print("WARNING: Automated searching violates Microsoft Terms of Service!")
-        print("Consequences: Account ban, point loss, IP blocking")
-        print("This tool helps ORGANIZE manual searches only!")
-        print("="*70 + "\n")
-    
-    def show_progress(self):
-        """Display current progress"""
-        pc_percent = (self.pc_searches / self.pc_max) * 100
-        mobile_percent = (self.mobile_searches / self.mobile_max) * 100
-        total_points = (self.pc_searches * self.pc_points) + (self.mobile_searches * self.mobile_points)
-        
-        print("\n📊 TODAY'S PROGRESS")
-        print("-" * 50)
-        print(f"PC Searches: {self.pc_searches}/{self.pc_max} ({pc_percent:.1f}%) - {self.pc_searches * self.pc_points} points")
-        print(f"{'█' * int(pc_percent/5)}{'-' * (20-int(pc_percent/5))}")
-        print(f"\nMobile Searches: {self.mobile_searches}/{self.mobile_max} ({mobile_percent:.1f}%) - {self.mobile_searches * self.mobile_points} points")
-        print(f"{'█' * int(mobile_percent/5)}{'-' * (20-int(mobile_percent/5))}")
-        print(f"\n💰 Total Points Today: {total_points}")
-        print("-" * 50 + "\n")
-    
-    def get_random_topics(self, count=5):
-        """Get random search topics"""
-        return random.sample(self.search_topics, min(count, len(self.search_topics)))
-    
-    def open_search(self, query, device_type='pc'):
-        """Open Bing search in browser (requires manual interaction)"""
-        url = f"https://www.bing.com/search?q={query.replace(' ', '+')}"
-        print(f"\n🔍 Opening search: '{query}'")
-        print(f"   Device: {device_type.upper()}")
-        print(f"   URL: {url}")
-        
-        # Open browser for MANUAL interaction
-        webbrowser.open(url)
-        
-        print("\n⚠️  IMPORTANT REMINDERS:")
-        print("   • You MUST interact with the search results manually")
-        print("   • Click on links, scroll, read content naturally")
-        print("   • Wait 10-30 seconds between searches")
-        print("   • Don't open multiple tabs rapidly\n")
-        
-        # Wait for user confirmation
-        input("Press ENTER after you've manually completed this search...")
-        
-        # Log the search
-        if device_type == 'pc' and self.pc_searches < self.pc_max:
-            self.pc_searches += 1
-        elif device_type == 'mobile' and self.mobile_searches < self.mobile_max:
-            self.mobile_searches += 1
-        
-        self.save_progress()
-    
-    def manual_search_session(self, device_type='pc'):
-        """Guided manual search session"""
-        max_searches = self.pc_max if device_type == 'pc' else self.mobile_max
-        current = self.pc_searches if device_type == 'pc' else self.mobile_searches
-        remaining = max_searches - current
-        
-        if remaining <= 0:
-            print(f"\n✅ You've completed all {device_type.upper()} searches for today!")
-            return
-        
-        print(f"\n🎯 MANUAL SEARCH SESSION - {device_type.upper()}")
-        print(f"Remaining searches: {remaining}")
-        
-        num_searches = int(input(f"\nHow many searches do you want to do now? (1-{remaining}): "))
-        num_searches = min(num_searches, remaining)
-        
-        topics = self.get_random_topics(num_searches)
-        
-        print(f"\n📝 Suggested topics for your {num_searches} searches:")
-        for i, topic in enumerate(topics, 1):
-            print(f"   {i}. {topic}")
-        
-        print("\n⏰ Remember: Wait 10-30 seconds between each search!")
-        input("\nPress ENTER to start...\n")
-        
-        for i, topic in enumerate(topics, 1):
-            print(f"\n--- Search {i}/{num_searches} ---")
-            self.open_search(topic, device_type)
-            
-            if i < num_searches:
-                wait_time = random.randint(10, 30)
-                print(f"\n⏳ Waiting {wait_time} seconds before next search...")
-                time.sleep(wait_time)
-        
-        print(f"\n✅ Session complete! Completed {num_searches} searches.")
-        self.show_progress()
-    
-    def show_menu(self):
-        """Display main menu"""
-        while True:
-            self.show_progress()
-            print("📋 MENU")
-            print("1. Start PC Search Session (Manual)")
-            print("2. Start Mobile Search Session (Manual)")
-            print("3. View Random Search Topics")
-            print("4. Show Safe Earning Tips")
-            print("5. Reset Today's Progress")
-            print("6. Exit")
-            
-            choice = input("\nSelect option (1-6): ").strip()
-            
-            if choice == '1':
-                self.manual_search_session('pc')
-            elif choice == '2':
-                self.manual_search_session('mobile')
-            elif choice == '3':
-                self.show_topics()
-            elif choice == '4':
-                self.show_safe_tips()
-            elif choice == '5':
-                confirm = input("Reset today's progress? (yes/no): ").lower()
-                if confirm == 'yes':
-                    self.reset_progress()
-                    print("✅ Progress reset!")
-            elif choice == '6':
-                print("\n👋 Goodbye! Remember: Manual searching only!")
-                break
-            else:
-                print("❌ Invalid option. Try again.")
-    
-    def show_topics(self):
-        """Display random search topics"""
-        print("\n💡 RANDOM SEARCH TOPIC IDEAS")
-        print("-" * 50)
-        topics = self.get_random_topics(15)
-        for i, topic in enumerate(topics, 1):
-            print(f"{i:2d}. {topic}")
-        print("-" * 50)
-        input("\nPress ENTER to continue...")
-    
-    def show_safe_tips(self):
-        """Display safe earning tips"""
-        print("\n✅ SAFE WAYS TO MAXIMIZE MICROSOFT REWARDS")
-        print("-" * 50)
-        print("1. ✓ Search genuinely interesting topics throughout the day")
-        print("2. ✓ Complete daily quizzes on Bing homepage")
-        print("3. ✓ Use Microsoft Edge browser for bonus points (+12/day)")
-        print("4. ✓ Enable Bing app on mobile for mobile searches")
-        print("5. ✓ Participate in daily streaks for bonus rewards")
-        print("6. ✓ Read news articles for 'Read & Earn' points")
-        print("7. ✓ Spread searches naturally - morning, lunch, evening")
-        print("8. ✓ Actually click and read search results")
-        print("\n❌ NEVER DO:")
-        print("   × Use automation scripts or bots")
-        print("   × Open searches too rapidly (< 10 seconds apart)")
-        print("   × Use VPN or multiple accounts")
-        print("   × Click through without reading content")
-        print("-" * 50)
-        input("\nPress ENTER to continue...")
 
-def main():
-    """Main function"""
-    helper = MicrosoftRewardsHelper()
-    helper.display_banner()
-    
-    print("Welcome to Microsoft Rewards Search Helper!")
-    print("This tool helps you organize your MANUAL searches.\n")
-    
-    try:
-        helper.show_menu()
-    except KeyboardInterrupt:
-        print("\n\n👋 Exiting... Remember to search manually!")
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
 
-if __name__ == "__main__":
-    main()
+
+
+
+<div bgcolor="#EAF0FE">
+
+<div align="center">
+	<table border="0" width="80%">
+		<tbody>
+		<tr>
+			<td>
+			<table border="0" width="100%" id="table1">
+				<tbody><tr>
+					<td colspan="2">
+					<p style="margin-left: 15px; margin-bottom: 10px">
+			<font face="Tahoma" size="2"><b>Power Data Recovery</b> is easy 
+			to use. You could choose one of the  modules below to  recover your data. </font>
+					</p></td>
+				</tr>
+				<tr>
+					<td width="21%">
+					<p style="margin-left: 25px" align="right">
+					<font face="Tahoma" size="2">
+			<b>Undelete Recovery</b></font></p></td>
+					<td width="78%"><font face="Tahoma" size="2">module could  recover data by accidental deletion. </font>
+					</td>
+				</tr>
+				<tr>
+					<td width="21%" valign="top">
+					<p style="margin-left: 25px" align="right">
+					<font face="Tahoma" size="2">
+			<b>Advanced Recovery</b></font></p></td>
+					<td width="78%"><font face="Tahoma" size="2">module could recover data from most of the data lost reasons including
+accidental formatting, fdisked or inaccessible drive and deleted partitions. Even you reinstalled your
+system, you still have a chance to recover your data by using this
+module. </font></td>
+				</tr>
+				<tr>
+					<td width="21%" valign="top">
+					<p style="margin-left: 25px" align="right">
+					<font face="Tahoma" size="2"> <b>Deep Scan 
+		      Recovery</b></font></p></td>
+					<td width="78%"><font face="Tahoma" size="2">module will scan the device by manufacturer's data format. It is
+powerful and could recover what ever left on you device. It support
+popular data format including MS Office files, graphic and picture
+files, audio and video files. For complete file formatting list, please
+visit <a href="http://www.eofsoft.com/deepscan.htm" target="_blank">http://www.eofsoft.com/deepscan<wbr>.htm</a></font></td>
+				</tr>
+				<tr>
+					<td width="99%" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="99%" colspan="2">
+					<p style="margin-left: 25px"><i>
+		      <font face="Tahoma" size="2"><b>*</b>A
+license key is required to recover data over 640K.
+To purchase a license key, please visit 
+					<a target="_blank" href="http://www.PowerDataRecovery.com/pdr_buynow.htm">http://www.PowerDataRecovery.com/pdr_buynow.htm</a> </font>
+		  			</i></p></td>
+				</tr>
+			</tbody></table>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+			<p style="margin-left: 15px; margin-bottom: 5px">
+			<font face="Verdana"><b>Case Study</b></font></p></td>
+		</tr>
+		<tr>
+			<td><p style="margin-left: 14px;"><u>
+
+			<font color="#5dac00" face="Verdana" size="1">
+
+			<a href="#0.1_How_do_I_recover_deleted_file%28s%29_and_folder%28s%29">
+
+			<font color="#000000">How do I recover 
+
+			deleted file(s) and folder(s)? </font></a> </font>
+
+			<font face="Verdana" size="1">
+
+					<br>
+
+					</font>
+
+			<font color="#5dac00" face="Verdana" size="1">
+
+			<a href="#0.1_How_do_I_recover_missing_or_lost_logical_drives">
+
+			<font color="#FF0000">How do I recover deleted or lost logical drives/partitions? 
+
+			</font></a> 
+
+			</font> 
+
+			<font face="Verdana" size="1" color="#FF0000">
+
+					<br>
+
+					</font>
+
+			<font color="#5dac00" face="Verdana" size="1">
+
+			<a href="#0.1_How_do_I_recover_formatted_logical_drives">
+
+			<font color="#000000">How do I recover formatted logical drives? 
+
+			</font></a> 
+
+			<font face="Verdana" size="1">
+
+					<br>
+
+					</font>
+
+			<a href="#0.1_How_do_I_recover_Fdisked_drives"><font color="#000000">How do I recover Fdisked drives?
+
+			</font></a> 
+
+			<font face="Verdana" size="1">
+
+					<br>
+
+					</font>
+
+			<a href="#0.1_How_do_I_recover_lost_file%28s%29_and_folder%28s%29">
+
+			<font color="#000000">How do I recover lost file(s) and folder(s)?
+
+			</font></a> 
+
+			<font face="Verdana" size="1">
+
+					<br>
+
+					</font>
+
+			<a href="#0.1_How_do_I_recover_Raw_Drive"><font color="#000000">How do I recover Raw Drive?</font></a><font face="Verdana" size="1"> <br>
+
+					</font>
+
+			<a href="#0.1_How_do_I_recover_dynamic-disk_Data_in_Windows">
+
+			<font color="#000000">How do I recover dynamic-disk Data in Windows? 
+
+			</font></a> </font></u></p>
+
+
+				<li>
+
+				<p style="margin-left: 14px;">
+
+				<font face="Verdana" size="1"><b>
+
+				<a name="0.1_How_do_I_recover_deleted_file(s)_and_folder(s)">How do 
+
+				I recover deleted file(s) and folder(s)?</a></b><br>
+
+				1. We recommend you use Undelete Recovery 
+
+				module of Power Data Recovery. <br>
+
+				2. Select the drive that you want to recover data in Undelete 
+				Recovery module. <br>
+
+				3. Select the files/folders that you want to recover.<br>
+
+				4. Save the files/folders that you want.<br>
+
+				Tip: If you cannot find the drive or files that you want 
+
+				to recover in Undelete Recovery module, <br>
+				please use Advanced Recovery 
+
+				module and Deep Scan Recovery module.<br>
+
+				&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;"><b>
+
+				<font face="Verdana" size="1">
+
+				<a name="0.1_How_do_I_recover_missing_or_lost_logical_drives">How do 
+
+				I recover deleted or lost logical drives/partitions?</a></font></b><font face="Verdana" size="1"><br>
+
+				1. We recommend you use Advanced 
+
+				Recovery 
+
+				module of Power Data Recovery.<br>2. <b>If you could see the 
+				lost/deleted partition in device list, please select it, and 
+				then click "Open" button. Otherwise, please go step 3.</b><br>3. Select the physical device which contains the lost/missing 
+				logical drive, and then click "Full Scan" button.<br>4. Select the partition you want to recover from the recognized 
+
+				partition list.<br>5. Select the files you like to recover from 
+				the recovered files list page.<br>6. Save the files.<br>&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;"><b><font face="Verdana" size="1">
+				<a name="0.1_How_do_I_recover_formatted_logical_drives">How do I 
+
+				recover formatted logical drives?</a></font></b><font face="Verdana" size="1"><br>
+				1. Please use Advanced Recovery module of Power Data Recovery.<br>
+				2. Select the logical drive/volume you want to recover data in 
+				the volume list page, and then click "Full Scan" button.<br>3. Select the correct file system from the recognized file 
+
+				system list.<br>4. Select the files you like to recover from the 
+				recovered files list page.<br>5. Save the files.<br><br>&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;">
+
+				<font face="Verdana" size="1"><b>
+
+				<a name="0.1_How_do_I_recover_Fdisked_drives">How do I recover 
+
+				Fdisked drives?</a></b><br>
+
+				1. Please use Advanced Recovery module of Power Data Recovery.<br>
+
+				2. Select the physical device that you want to recover data. And 
+				then click "Full Scan" button.<br>
+
+				3. Select the partition you want to recover from the recognized 
+
+				partition list. And then click "Show Files" button.<br>
+
+				4. Select the files you like to recover from the recovered files 
+				list page.<br>
+
+				5. Save the files.<br>
+
+				<br>
+
+&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;">
+
+				<font face="Verdana" size="1"><b>
+
+				<a name="0.1_How_do_I_recover_lost_file(s)_and_folder(s)">How do I 
+
+				recover lost file(s) and folder(s)?</a></b><br>
+
+				1. We recommend you use Undelete Recovery 
+
+				module of Power Data Recovery. <br>
+
+				2. Select the logical drive you want to recover data. <br>
+
+				3. Select the files/folders you like to recover from the 
+				recovered files list page.<br>
+
+				4. Save the files you want.<br>
+
+				Tip: if you cannot find the logical drive or files/folders that 
+
+				you want to recover in Power Data <br>
+				Recovery, please use Advanced 
+
+				Recovery module.<br>
+
+				<br>
+
+&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;">
+
+				<font face="Verdana" size="1"><b>
+
+				<a name="0.1_How_do_I_recover_Raw_Drive">How do I recover Raw Drive?</a></b><br>
+
+				If the file system of the logical drive you want to restore is 
+
+				showed as RAW? please recover <br>
+				data with following steps.<br>
+
+				1. Please use Advanced Recovery module of Power Data Recovery.<br>
+				2. Select the logical drive/volume you want to recover data in 
+				the volume list page.
+				<br>3. And then click "Open" button. If the "Open function" fails, please click "Full Scan" button.
+				<br>4. If you use "Full Scan", please select the correct file system from the scanning list.<br>5. Select the files you want recover.<br>5. Save the files.<br>
+				<br>&nbsp;</font></p></li>
+
+				<li>
+
+				<p style="margin-left: 14px;"><b>
+
+				<font face="Verdana" size="1">
+
+				<a name="0.1_How_do_I_recover_dynamic-disk_Data_in_Windows">How do I 
+
+				recover dynamic-disk Data in Windows?</a></font></b><font face="Verdana" size="1"><br>
+
+				1. Please use Advanced Recovery 
+
+				module of Power Data Recovery.<br>
+
+				2. Select the Dynamic Volume you want to recover data in the 
+
+				volume list page.<br>
+				3. Try "Open" button first, and then try "Full Scan" if the "Open" function fails.<br>
+				4. Select the correct file system from the recognized file 
+				system list.<br>
+				5. Select the files you want recover.<br>
+				6. Save the files.<br><br>Tip: For Simple Volume and Mirrored Volume, please scan the physical device to get your data back, if you cannot find the 
+				Dynamic Volume in the volume list page.<br> 
+				</font></p></li></td>
+		</tr>
+	</tbody></table>
+</div>
+
+</div>
+
+</body></html>
